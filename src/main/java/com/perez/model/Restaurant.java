@@ -1,0 +1,63 @@
+package com.perez.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+public class Restaurant {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @ManyToOne
+    private User owner;
+
+    private String name;
+    private String description;
+    private String cuisineType;
+
+    @ManyToOne
+    @JoinColumn(name = "address_id")
+    private Address address;
+
+    @Embedded    //is a class that represents an embedded object
+    private ContactInformation contactInformation;
+
+    private String openingHours;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "restaurant",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Review>reviews=new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy="restaurant",cascade=CascadeType.ALL,orphanRemoval = true)
+              //mappedBy: so it doesn't create a separate table
+    private List<Order> orders=new ArrayList<>();
+
+    private int numRating;
+
+    @ElementCollection
+    @Column(length = 1000)
+    private List<String> images;
+
+    private LocalDateTime registrationDate;
+
+    private boolean open;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "restaurant",cascade = CascadeType.ALL)
+    private List<Food> foods=new ArrayList<>();
+
+}
+
