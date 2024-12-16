@@ -37,7 +37,7 @@ public class CustomerService implements UserDetailsService {
 
         List<GrantedAuthority> authorities=new ArrayList<>();
 
-        authorities.add(new SimpleGrantedAuthority(role.toString()));
+        authorities.add(new SimpleGrantedAuthority(role.toString())); //coveted chain authorization
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),user.getPassword(),authorities);

@@ -26,7 +26,7 @@ public class JwtProvider {
 
 		String jwt=Jwts.builder()
 				.setIssuedAt(new Date())
-				.setExpiration(new Date(new Date().getTime()+86400000)) //24 hours
+				.setExpiration(new Date(new Date().getTime()+86400000)) //after 24 hours the session expires
 				.claim("email",auth.getName())
 				.claim("authorities", roles)
 				.signWith(key)
@@ -35,6 +35,7 @@ public class JwtProvider {
 		
 	}
 
+	//method receive email from jwt
 	public String getEmailFromJwtToken(String jwt) {
 		jwt=jwt.substring(7);
 		
