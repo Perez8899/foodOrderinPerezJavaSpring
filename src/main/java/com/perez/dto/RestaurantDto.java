@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @Embeddable
-public class RestaurantDto {
+public class RestaurantDto {   //FAVORITE
 
     private String title;
 

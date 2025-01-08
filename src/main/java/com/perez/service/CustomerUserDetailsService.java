@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class CustomerService implements UserDetailsService {
+public class CustomerUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
@@ -26,7 +26,7 @@ public class CustomerService implements UserDetailsService {
 
         if(user==null) {
 
-            throw new UsernameNotFoundException("Usuario no encontrado con el email:- "+username);
+            throw new UsernameNotFoundException("User not found with email:- "+username);
         }
 
         USER_ROLE role=user.getRole();
