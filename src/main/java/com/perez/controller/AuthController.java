@@ -5,16 +5,19 @@ import com.perez.model.Cart;
 import com.perez.model.USER_ROLE;
 import com.perez.model.User;
 import com.perez.reporsitory.UserRepository;
+import com.perez.request.LoginRequest;
 import com.perez.response.AuthResponse;
-import com.perez.service.CustomerService;
+import com.perez.service.CustomerUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -31,19 +35,20 @@ public class AuthController {
    private UserRepository userRepository;
    @Autowired
    private PasswordEncoder passwordEncoder;
+   @Autowired
    private JwtProvider jwtProvider;
    @Autowired
-   private CustomerService customerService;
+   private CustomerUserDetailsService customerUserDetailsService;
    @Autowired
    private CartRepository cartRepository;
-   private PasswordResetTokenService passwordResetTokenService;
+  // private PasswordResetTokenService passwordResetTokenService;
 
-   private UserService userService;
+   //private UserService userService;
 
-   public AuthController(UserRepository userRepository,
+  /* public AuthController(UserRepository userRepository,
                          PasswordEncoder passwordEncoder,
                          JwtProvider jwtProvider,
-                         CustomerService customerService,
+                         CustomerUserDetailsService customerUserDetailsService,
                          CartRepository cartRepository,
                          PasswordResetTokenService passwordResetTokenService,
                          UserService userService
@@ -51,14 +56,14 @@ public class AuthController {
       this.userRepository = userRepository;
       this.passwordEncoder = passwordEncoder;
       this.jwtProvider = jwtProvider;
-      this.customerService = customerService;
+      this.customerUserDetailsService = customerUserDetailsService;
       this.cartRepository=cartRepository;
       this.passwordResetTokenService=passwordResetTokenService;
       this.userService=userService;
 
-   }
+   } */
 
-   @PostMapping("/signup")
+   @PostMapping("/signup")  //REGISTER
    public ResponseEntity<AuthResponse> createUserHandler(@RequestBody User user) throws Exception {
 
       String email = user.getEmail();
@@ -102,11 +107,10 @@ public class AuthController {
       authResponse.setMessage("Register Success");
       authResponse.setRole(savedUser.getRole());
 
-      return new ResponseEntity<>(authResponse, HttpStatus.OK); //ttpStatus.OK
-//3.00 horas
+      return new ResponseEntity<>(authResponse, HttpStatus.OK);
    }
 
-   @PostMapping("/signin")
+   @PostMapping("/signin") //LOGIN
    public ResponseEntity<AuthResponse> signin(@RequestBody LoginRequest loginRequest) {
 
       String username = loginRequest.getEmail();
@@ -115,8 +119,9 @@ public class AuthController {
       System.out.println(username + " ----- " + password);
 
       Authentication authentication = authenticate(username, password);
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+      SecurityContextHolder.getContext().setAuthentication(authentication);//nom lo puso el en el video
 
+      //the token is generated
       String token = jwtProvider.generateToken(authentication);
       AuthResponse authResponse = new AuthResponse();
 
@@ -134,21 +139,27 @@ public class AuthController {
    }
 
    private Authentication authenticate(String username, String password) {
-      UserDetails userDetails = customUserDetails.loadUserByUsername(username);
+      UserDetails userDetails = customerUserDetailsService.loadUserByUsername(username);
 
       System.out.println("sign in userDetails - " + userDetails);
 
+      //if the user is not in the database
       if (userDetails == null) {
          System.out.println("sign in userDetails - null " + userDetails);
-         throw new BadCredentialsException("Invalid username or password");
+         //invalid credentials
+         throw new BadCredentialsException("Invalid username");
       }
-      if (!passwordEncoder.matches(password, userDetails.getPassword())) {
+
+      //Matches authenticated users, when passwords are encrypted. PASSWRD (unencrypted).
+      if (!passwordEncoder.matches(password, userDetails.getPassword())) { //encrypted password obtained from the database
          System.out.println("sign in userDetails - password not match " + userDetails);
-         throw new BadCredentialsException("Invalid username or password");
+         throw new BadCredentialsException("Invalid password");
       }
+      //if user and password match
       return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
    }
 
+   /*
    @PostMapping("/reset-password")
    public ResponseEntity<ApiResponse> resetPassword(
 
@@ -195,7 +206,7 @@ public class AuthController {
       res.setStatus(true);
 
       return ResponseEntity.ok(res);
-   }
+   } */
 
 }
 

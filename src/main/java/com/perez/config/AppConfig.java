@@ -60,7 +60,7 @@ public class AppConfig {  //config spring security
         };
     }
 
-    @Bean                                 //No password will be stored in the database, for security. BCryt
+    @Bean    //No password will be stored in the database, for security. BCryt
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
