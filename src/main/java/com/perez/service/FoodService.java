@@ -10,6 +10,7 @@ import com.perez.request.CreateFoodRequest;
 import java.util.List;
 
 public interface FoodService { //All Methods and Public
+
     public Food createFood(CreateFoodRequest req, Category category, Restaurant restaurant)  throws FoodException, RestaurantException;
 
                                //restaurant owner can remove food
