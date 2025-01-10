@@ -44,8 +44,8 @@ public class AppConfig {  //config spring security
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 CorsConfiguration cfg = new CorsConfiguration();
-                cfg.setAllowedOrigins(Arrays.asList(               //front end url
-                        "http://localhost:3000",
+                cfg.setAllowedOrigins(Arrays.asList(               //front-end url
+                        "http://localhost:3000",                   //React
                         "https://hyh-food.app",
                         "http://localhost:4200"
                 ));

@@ -4,6 +4,7 @@ import com.perez.config.JwtProvider;
 import com.perez.model.Cart;
 import com.perez.model.USER_ROLE;
 import com.perez.model.User;
+import com.perez.reporsitory.CartRepository;
 import com.perez.reporsitory.UserRepository;
 import com.perez.request.LoginRequest;
 import com.perez.response.AuthResponse;
