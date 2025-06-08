@@ -117,10 +117,11 @@ public class AuthController {
       String username = loginRequest.getEmail();
       String password = loginRequest.getPassword();
 
-      System.out.println(username + " ----- " + password);
+      System.out.println(username + " ----- " + password);  //esto me muestra la contrasena hay que eliminar muestra datos sencibles
+      //logger.info("Intento de login para usuario: {}", username);
 
       Authentication authentication = authenticate(username, password);
-      SecurityContextHolder.getContext().setAuthentication(authentication);//nom lo puso el en el video
+      SecurityContextHolder.getContext().setAuthentication(authentication);//falta configurar
 
       //the token is generated
       String token = jwtProvider.generateToken(authentication);

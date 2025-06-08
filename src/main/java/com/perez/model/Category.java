@@ -20,6 +20,7 @@ public class Category {
 
     @ManyToOne
     @JsonIgnore                    //ignore I don't need it within the order
+    @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
 }

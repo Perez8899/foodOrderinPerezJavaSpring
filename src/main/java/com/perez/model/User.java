@@ -38,5 +38,4 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) //When we delete the user, the related address is also deleted
     private List<Address> addresses = new ArrayList<>();
 
-
-}
+   }

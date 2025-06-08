@@ -23,10 +23,18 @@ public class CategoryServiceImplementation implements CategoryService{
     @Override
     public Category createCategory(String name,Long userId) throws RestaurantException {
         Restaurant restaurant=restaurantService.getRestaurantByUserId(userId);
-        Category createdCategory=new Category();
+        if(restaurant== null){
+            throw new RestaurantException("User has no restaurant assined");
+        }
 
+        Category createdCategory=new Category();
         createdCategory.setName(name);
         createdCategory.setRestaurant(restaurant);
+
+        if(categoryRepository.existsByNameAndRestaurantId(name, restaurant.getId())){
+            throw  new RestaurantException("Category name alredy xist for this Restaurant");
+
+        }
         return categoryRepository.save(createdCategory);
     }
 
