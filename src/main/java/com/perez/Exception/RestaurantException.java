@@ -5,6 +5,7 @@ public class RestaurantException extends Exception{
 
     public RestaurantException(String message) {
         super(message);
+        // super(message != null ? message : "Error desconocido en el restaurante");
 
     }
 

@@ -23,14 +23,13 @@ public class CategoryController {
     public UserService userService;
 
     @PostMapping("/admin/category") //for owner restaurant
-    public ResponseEntity<Category> createdCategory(
-            @RequestHeader("Authorization")String jwt,
-            @RequestBody Category category) throws RestaurantException, UserException {
+    public ResponseEntity<Category> createdCategory( @RequestBody Category category,
+            @RequestHeader("Authorization")String jwt) throws RestaurantException, UserException {
 
         User user=userService.findUserProfileByJwt(jwt);
-
         Category createdCategory=categoryService.createCategory(category.getName(), user.getId());
-        return new ResponseEntity<Category>(createdCategory, HttpStatus.OK);
+
+        return ResponseEntity.ok(createdCategory);
     }
 
     @GetMapping("/category/restaurant/{id}")   //endpoint for customers

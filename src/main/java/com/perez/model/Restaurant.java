@@ -21,6 +21,7 @@ public class Restaurant {
     private Long id;
 
     @ManyToOne
+    //@JoinColumn(name = "owner_id", unique = true) // Asegura unicidad
     private User owner;
 
     private String name;
@@ -58,6 +59,10 @@ public class Restaurant {
     @JsonIgnore
     @OneToMany(mappedBy = "restaurant",cascade = CascadeType.ALL)
     private List<Food> foods=new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Category> categories = new ArrayList<>();
 
 }
 

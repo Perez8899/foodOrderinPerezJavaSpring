@@ -96,6 +96,7 @@ public class RestaurantServiceImplementation implements RestaurantService{
         return restaurants;
     }
 
+
     @Override
     public List<Restaurant> searchRestaurant(String keyword) {
         return restaurantRepository.findBySearchQuery(keyword);

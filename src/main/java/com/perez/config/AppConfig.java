@@ -38,7 +38,7 @@ public class AppConfig {  //config spring security
 
     }
 
-    // CORS Configuration
+    // CORS Configuration //security mechanism, how the front-end can access the back-end mechanism --only known domains
     private CorsConfigurationSource corsConfigurationSource() {
         return new CorsConfigurationSource() {
             @Override
@@ -46,7 +46,7 @@ public class AppConfig {  //config spring security
                 CorsConfiguration cfg = new CorsConfiguration();
                 cfg.setAllowedOrigins(Arrays.asList(               //front-end url
                         "http://localhost:3000",                   //React
-                        "https://hyh-food.app",
+                        "https://hyh-food.app",                    //deploy
                         "http://localhost:4200"
                 ));
                 //front end methods configuration
@@ -54,7 +54,7 @@ public class AppConfig {  //config spring security
                 cfg.setAllowCredentials(true);                         //allow credentials
                 cfg.setAllowedHeaders(Collections.singletonList("*"));
                 cfg.setExposedHeaders(Arrays.asList("Authorization"));
-                cfg.setMaxAge(3600L);
+                cfg.setMaxAge(3600L);                                  // Cache the configuration for 1 hour
                 return cfg;
             }
         };
