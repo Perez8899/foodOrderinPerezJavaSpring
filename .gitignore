@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# Config files (sensitive data)
+src/main/resources/application*.properties  # Ignora todos los archivos properties
+src/main/resources/application*.yml
+
 ### STS ###
 .apt_generated
 .classpath
