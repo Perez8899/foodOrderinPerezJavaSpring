@@ -32,7 +32,7 @@ public class CategoryServiceImplementation implements CategoryService{
         createdCategory.setRestaurant(restaurant);
 
         if(categoryRepository.existsByNameAndRestaurantId(name, restaurant.getId())){
-            throw  new RestaurantException("Category name alredy xist for this Restaurant");
+            throw  new RestaurantException("Categoria ya existe para este Restaurante");
 
         }
         return categoryRepository.save(createdCategory);

@@ -7,6 +7,7 @@ import com.perez.model.User;
 
 import java.util.List;
 
+
 public interface NotificationService {
 
     public Notification sendOrderStatusNotification(Order order);

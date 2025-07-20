@@ -33,29 +33,57 @@ public class OrderServiceImplementation implements OrderService{
     @Autowired
     private UserRepository userRepository;
 
-   // @Autowired
+    @Autowired
     private PaymentService paymentService;
 
-  //  @Autowired
+    @Autowired
     private NotificationService notificationService;
 
 
     //----------------------------methods----------------------------------------------------
   // @Override
-    //    public PaymentResponse createOrder  //ORIGINAL
+    //    public nousado createOrder  //ORIGINAL
     @Override
-    public Order createOrder(CreateOrderRequest order, User user) throws UserException, RestaurantException, CartException {//, StripeException
+    public Order createOrder(CreateOrderRequest order, User user) throws UserException, RestaurantException, CartException { //, StripeException
 
-        Address shippAddress = order.getDeliveryAddress();
-        Address savedAddress = addressRepository.save(shippAddress);
+//        Address shippAddress = order.getDeliveryAddress();
+//        Address savedAddress = addressRepository.save(shippAddress);
+//
+//        if(!user.getAddresses().contains(savedAddress)) {
+//            user.getAddresses().add(savedAddress);
+//        }
+//
+//        System.out.println("user addresses --------------  "+user.getAddresses());
+//
+//        userRepository.save(user);
+        // Verificar si la dirección ya existe para este usuario
+        // 1. Buscar dirección existente
+        Optional<Address> existingAddress = user.getAddresses().stream()
+                .filter(addr ->
+                        addr.getStreetAddress() != null &&
+                                order.getDeliveryAddress() != null &&
+                                order.getDeliveryAddress().getStreetAddress() != null &&
+                                addr.getStreetAddress().equals(order.getDeliveryAddress().getStreetAddress())
+                )
+                .filter(addr ->
+                        addr.getPostalCode() != null &&
+                                order.getDeliveryAddress() != null &&
+                                order.getDeliveryAddress().getPostalCode() != null &&
+                                addr.getPostalCode().equals(order.getDeliveryAddress().getPostalCode())
+                )
+                .findFirst();
 
-        if(!user.getAddresses().contains(savedAddress)) {
+
+        // 2. Usar dirección existente o guardar nueva
+        Address savedAddress;
+        if (existingAddress.isPresent()) {
+            savedAddress = existingAddress.get();
+        } else {
+            savedAddress = addressRepository.save(order.getDeliveryAddress());
             user.getAddresses().add(savedAddress);
+            userRepository.save(user);
         }
 
-        System.out.println("user addresses --------------  "+user.getAddresses());
-
-        userRepository.save(user);
 
         Optional<Restaurant> restaurant = restaurantRepository.findById(order.getRestaurantId());
         if(restaurant.isEmpty()) {
@@ -67,7 +95,7 @@ public class OrderServiceImplementation implements OrderService{
         createdOrder.setCustomer(user);
         createdOrder.setDeliveryAddress(savedAddress);
         createdOrder.setCreatedAt(new Date());
-        createdOrder.setOrderStatus("PENDING");
+        createdOrder.setOrderStatus("PENDIENTE");
         createdOrder.setRestaurant(restaurant.get());
 
         Cart cart = cartService.findCartByUserId(user.getId());
@@ -100,7 +128,7 @@ public class OrderServiceImplementation implements OrderService{
 
 
         return  createdOrder; //SE LO AGREGUE PPARA QUE ME QUITE EL ERROR DE PaymentRespone
-       // PaymentResponse res=paymentService.generatePaymentLink(savedOrder); //ORIGINAL
+       // nousado res=paymentService.generatePaymentLink(savedOrder); //ORIGINAL
        // return res;
 
     }
@@ -157,8 +185,8 @@ public class OrderServiceImplementation implements OrderService{
 
         System.out.println("--------- "+orderStatus);
 
-        if(orderStatus.equals("OUT_FOR_DELIVERY") || orderStatus.equals("DELIVERED")
-                || orderStatus.equals("COMPLETED") || orderStatus.equals("PENDING")) {
+        if(orderStatus.equals("OUT_FOR_DELIVERY") || orderStatus.equals("ENTREGADO")
+                || orderStatus.equals("COMPLETADO") || orderStatus.equals("PENDIENTE")) {
 
             order.setOrderStatus(orderStatus);
             Notification notification=notificationService.sendOrderStatusNotification(order);

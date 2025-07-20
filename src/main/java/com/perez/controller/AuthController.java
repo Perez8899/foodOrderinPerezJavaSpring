@@ -9,6 +9,7 @@ import com.perez.reporsitory.UserRepository;
 import com.perez.request.LoginRequest;
 import com.perez.response.AuthResponse;
 import com.perez.service.CustomerUserDetailsService;
+import com.perez.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,7 +46,7 @@ public class AuthController {
    private CartRepository cartRepository;
   // private PasswordResetTokenService passwordResetTokenService;
 
-   //private UserService userService;
+   private UserService userService;
 
   /* public AuthController(UserRepository userRepository,
                          PasswordEncoder passwordEncoder,
@@ -76,7 +78,7 @@ public class AuthController {
 
       if (isEmailExist!=null) {    //if the email exists we validate
 
-         throw new Exception("Email Is Already Used With Another Account");
+         throw new Exception("El correo electrónico ya se utiliza con otra cuenta");
       }
 
       // new user data
@@ -105,7 +107,7 @@ public class AuthController {
 
       AuthResponse authResponse = new AuthResponse();
       authResponse.setJwt(token);
-      authResponse.setMessage("Register Success");
+      authResponse.setMessage("Registro Exitoso");
       authResponse.setRole(savedUser.getRole());
 
       return new ResponseEntity<>(authResponse, HttpStatus.OK);
@@ -120,42 +122,45 @@ public class AuthController {
       System.out.println(username + " ----- " + password);  //esto me muestra la contrasena hay que eliminar muestra datos sencibles
       //logger.info("Intento de login para usuario: {}", username);
 
-      Authentication authentication = authenticate(username, password);
-      SecurityContextHolder.getContext().setAuthentication(authentication);//falta configurar
+      try {
+         Authentication authentication = authenticate(username, password);
+         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-      //the token is generated
-      String token = jwtProvider.generateToken(authentication);
-      AuthResponse authResponse = new AuthResponse();
+         //the token is generated
+         String token = jwtProvider.generateToken(authentication);
+         AuthResponse authResponse = new AuthResponse();
 
-      authResponse.setMessage("Login Success");
-      authResponse.setJwt(token);
-      Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+         authResponse.setMessage("Inicio de sesión exitoso");
+         authResponse.setJwt(token);
+         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 
+         String roleName = authorities.isEmpty() ? null : authorities.iterator().next().getAuthority();
 
-      String roleName = authorities.isEmpty() ? null : authorities.iterator().next().getAuthority();
+         authResponse.setRole(USER_ROLE.valueOf(roleName));
 
-
-      authResponse.setRole(USER_ROLE.valueOf(roleName));
-
-      return new ResponseEntity<AuthResponse>(authResponse, HttpStatus.OK);
+         return ResponseEntity.ok(authResponse);
+      } catch (BadCredentialsException ex) {
+         //personalized message
+         AuthResponse errorResponse = new AuthResponse();
+         errorResponse.setMessage(ex.getMessage());
+         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+      }
    }
 
    private Authentication authenticate(String username, String password) {
-      UserDetails userDetails = customerUserDetailsService.loadUserByUsername(username);
-
-      System.out.println("sign in userDetails - " + userDetails);
-
-      //if the user is not in the database
-      if (userDetails == null) {
-         System.out.println("sign in userDetails - null " + userDetails);
-         //invalid credentials
-         throw new BadCredentialsException("Invalid username");
+      UserDetails userDetails;
+      try {
+         userDetails = customerUserDetailsService.loadUserByUsername(username);
+      } catch (UsernameNotFoundException ex) {
+         // Generic message for security
+         throw new BadCredentialsException("Credenciales inválidas. Verifica tu correo o contraseña.");
       }
 
       //Matches authenticated users, when passwords are encrypted. PASSWRD (unencrypted).
       if (!passwordEncoder.matches(password, userDetails.getPassword())) { //encrypted password obtained from the database
          System.out.println("sign in userDetails - password not match " + userDetails);
-         throw new BadCredentialsException("Invalid password");
+         //Generic message for security
+         throw new BadCredentialsException("Credenciales inválidas. Verifica tu correo o contraseña.");
       }
       //if user and password match
       return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

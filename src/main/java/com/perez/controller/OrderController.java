@@ -9,6 +9,7 @@ import com.perez.model.PaymentResponse;
 import com.perez.model.User;
 import com.perez.request.CreateOrderRequest;
 import com.perez.service.OrderService;
+import com.perez.service.PaymentService;
 import com.perez.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,27 +24,31 @@ public class OrderController {     //----users---------
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private PaymentService paymentService;
+
     @Autowired
     private UserService userService;
 
     //----------------methods----------------------------------------------------------------------
     @PostMapping("/order")
-    //public ResponseEntity<PaymentResponse> createOrder(@RequestBody CreateOrderRequest order,
-    public ResponseEntity<Order> createOrder(@RequestBody CreateOrderRequest req,
-                                                       @RequestHeader("Authorization") String jwt)
-            throws UserException, RestaurantException,
-            CartException,
+    public ResponseEntity<PaymentResponse> createOrder(@RequestBody CreateOrderRequest req,
+    @RequestHeader("Authorization") String jwt)
+    //public ResponseEntity<Order> createOrder(@RequestBody CreateOrderRequest req,
+                                                      // @RequestHeader("Authorization") String jwt)
+            throws Exception
             //StripeException,
-            OrderException {
+    {
 
         User user = userService.findUserProfileByJwt(jwt);
+        Order order = orderService.createOrder(req, user);
         System.out.println("req user " + user.getEmail());
-        if (req != null) {
-            //PaymentResponse res = orderService.createOrder(order, user);
-            Order order = orderService.createOrder(req, user);
-            return ResponseEntity.ok(order);
+        PaymentResponse res = paymentService.generatePaymentLink(order);
 
-        } else throw new OrderException("Please provide valid request body");
+            return new ResponseEntity<>(res,HttpStatus.OK);
+
+
 
     }
 

@@ -5,6 +5,7 @@ import com.perez.Exception.RestaurantException;
 import com.perez.model.Category;
 import com.perez.model.Food;
 import com.perez.model.Restaurant;
+import com.perez.reporsitory.IngredientCategoryRepository;
 import com.perez.reporsitory.FoodRepository;
 import com.perez.request.CreateFoodRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +26,12 @@ public class FoodServiceImplementation implements FoodService{ //implements the 
 //	@Autowired
 //	private RestaurantRepository restaurantRepository;
 
-  //  @Autowired
-    //private IngredientsService ingredientService;
+    @Autowired
+    private IngredientsService ingredientService;
 
 
-   // @Autowired
-   // private IngredientsCategoryRepository ingredientCategoryRepo;
+    @Autowired
+    private IngredientCategoryRepository ingredientCategoryRepo;
 
     //--------------methods----------------------------------------------------------------------
     @Override

@@ -17,6 +17,7 @@ public class Notification {
     private User customer;
 
     @ManyToOne
+    @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
     private String message;
