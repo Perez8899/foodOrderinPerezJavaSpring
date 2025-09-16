@@ -8,11 +8,12 @@ import com.perez.model.Order;
 import com.perez.model.User;
 import com.perez.request.CreateOrderRequest;
 
+import java.util.Date;
 import java.util.List;
 
 public interface OrderService {  //All Methods and Public
 
-    //public nousado createOrder(CreateOrderRequest order, User user) throws UserException, RestaurantException, CartException, StripeException; //ORIGINAL
+    //public  createOrder(CreateOrderRequest order, User user) throws UserException, RestaurantException, CartException, StripeException; //ORIGINAL
     public Order createOrder(CreateOrderRequest order, User user) throws UserException, RestaurantException, CartException;
 
     public Order updateOrder(Long orderId, String orderStatus) throws OrderException;
@@ -24,4 +25,6 @@ public interface OrderService {  //All Methods and Public
     public List<Order> getOrdersOfRestaurant(Long restaurantId,String orderStatus) throws OrderException, RestaurantException;
 
     public Order findOrderById (Long orderId) throws Exception;
+
+    public List<Order> getOrdersByRestaurantAndDateRange(Long restaurantId, Date startDate, Date endDate)throws OrderException;
 }

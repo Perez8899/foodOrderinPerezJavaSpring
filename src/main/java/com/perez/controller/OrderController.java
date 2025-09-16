@@ -12,10 +12,12 @@ import com.perez.service.OrderService;
 import com.perez.service.PaymentService;
 import com.perez.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -35,10 +37,7 @@ public class OrderController {     //----users---------
     @PostMapping("/order")
     public ResponseEntity<PaymentResponse> createOrder(@RequestBody CreateOrderRequest req,
     @RequestHeader("Authorization") String jwt)
-    //public ResponseEntity<Order> createOrder(@RequestBody CreateOrderRequest req,
-                                                      // @RequestHeader("Authorization") String jwt)
             throws Exception
-            //StripeException,
     {
 
         User user = userService.findUserProfileByJwt(jwt);

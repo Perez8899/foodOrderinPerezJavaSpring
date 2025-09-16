@@ -69,7 +69,6 @@ public class AdminRestaurantController {
 
     }
 
-    //ME DA ERROR CREO QUE ES POR DUPLICADO DEL OWNER ID
     @GetMapping("/user")
     public ResponseEntity<Restaurant> findRestaurantsByUserId(
             @RequestHeader("Authorization") String jwt) throws RestaurantException, UserException {

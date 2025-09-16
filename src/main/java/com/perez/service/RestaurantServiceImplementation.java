@@ -23,8 +23,7 @@ public class RestaurantServiceImplementation implements RestaurantService{
     @Autowired
     private AddressRepository addressRepository;
 
-  //  @Autowired
-    //    private UserService userService;
+
 
     @Autowired
     private UserRepository userRepository;

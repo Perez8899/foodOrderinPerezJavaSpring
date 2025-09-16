@@ -23,8 +23,6 @@ public class FoodServiceImplementation implements FoodService{ //implements the 
 
     @Autowired
     private FoodRepository foodRepository;
-//	@Autowired
-//	private RestaurantRepository restaurantRepository;
 
     @Autowired
     private IngredientsService ingredientService;

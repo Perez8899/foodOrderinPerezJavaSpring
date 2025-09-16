@@ -49,7 +49,7 @@ public class EventController {
     public ResponseEntity<ApiResponse> deleteEvents(
             @PathVariable Long id) throws Exception{
         eventService.deleteEvent(id);
-        ApiResponse res=new ApiResponse("Events Deleted",true);
+        ApiResponse res=new ApiResponse("Evento Eliminado",true);
         return new ResponseEntity<>(res,HttpStatus.ACCEPTED);
     }
 

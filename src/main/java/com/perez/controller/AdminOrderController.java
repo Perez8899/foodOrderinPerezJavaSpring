@@ -6,10 +6,12 @@ import com.perez.model.Order;
 import com.perez.service.OrderService;
 import com.perez.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -39,7 +41,6 @@ public class AdminOrderController {    //------ADMIN----
         List<Order> orders = orderService.
                 getOrdersOfRestaurant(restaurantId,order_status);
 
-//    		System.out.println("ORDER STATUS----- "+orderStatus);
         return ResponseEntity.ok(orders);
 
     }
@@ -52,4 +53,14 @@ public class AdminOrderController {    //------ADMIN----
         return ResponseEntity.ok(orders);
 
     }
+
+    @GetMapping("/restaurant/{restaurantId}/report")
+    public List<Order> getRestaurantOrdersByDate(
+            @PathVariable Long restaurantId,
+            @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate
+    ) throws OrderException {
+        return orderService.getOrdersByRestaurantAndDateRange(restaurantId, startDate, endDate);
+    }
+
 }

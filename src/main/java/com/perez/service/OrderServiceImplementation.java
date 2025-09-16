@@ -41,23 +41,11 @@ public class OrderServiceImplementation implements OrderService{
 
 
     //----------------------------methods----------------------------------------------------
-  // @Override
-    //    public nousado createOrder  //ORIGINAL
     @Override
     public Order createOrder(CreateOrderRequest order, User user) throws UserException, RestaurantException, CartException { //, StripeException
 
-//        Address shippAddress = order.getDeliveryAddress();
-//        Address savedAddress = addressRepository.save(shippAddress);
-//
-//        if(!user.getAddresses().contains(savedAddress)) {
-//            user.getAddresses().add(savedAddress);
-//        }
-//
-//        System.out.println("user addresses --------------  "+user.getAddresses());
-//
-//        userRepository.save(user);
-        // Verificar si la dirección ya existe para este usuario
-        // 1. Buscar dirección existente
+        // Check if the address already exists for this user
+// 1. Search for existing address
         Optional<Address> existingAddress = user.getAddresses().stream()
                 .filter(addr ->
                         addr.getStreetAddress() != null &&
@@ -74,7 +62,7 @@ public class OrderServiceImplementation implements OrderService{
                 .findFirst();
 
 
-        // 2. Usar dirección existente o guardar nueva
+        // 2.Use existing address or save new one
         Address savedAddress;
         if (existingAddress.isPresent()) {
             savedAddress = existingAddress.get();
@@ -100,6 +88,13 @@ public class OrderServiceImplementation implements OrderService{
 
         Cart cart = cartService.findCartByUserId(user.getId());
 
+
+        double ivaRate =0.13;          // 13% IVA
+        double platformFee = 200.0;       // platform commission
+        double deliveryFee = 500.0;       // delivery cost
+
+        double subtotal = 0;
+
         List<OrderItem> orderItems = new ArrayList<>();
 
         for (CartItem cartItem : cart.getItems()) {
@@ -107,17 +102,23 @@ public class OrderServiceImplementation implements OrderService{
             orderItem.setFood(cartItem.getFood());
             orderItem.setIngredients(cartItem.getIngredients());
             orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setTotalPrice(cartItem.getFood().getPrice()* cartItem.getQuantity());
+
+            double itemTotal = cartItem.getFood().getPrice() * cartItem.getQuantity();
+            orderItem.setTotalPrice(itemTotal);
+
+            subtotal += itemTotal;
 
             OrderItem savedOrderItem = orderItemRepository.save(orderItem);
             orderItems.add(savedOrderItem);
         }
 
-        Long totalPrice = cartService.calculateCartTotals(cart);
+        // Calculate total with VAT and fees
+        double ivaAmount = subtotal * ivaRate;
+        double totalAmount = subtotal + ivaAmount + platformFee + deliveryFee;
 
-        createdOrder.setTotalAmount(totalPrice);
-        createdOrder.setRestaurant(restaurant.get());
+        createdOrder.setTotalAmount((long) totalAmount);
         createdOrder.setItems(orderItems);
+        // --- End of calculation ---
 
         Order savedOrder = orderRepository.save(createdOrder);
 
@@ -127,9 +128,7 @@ public class OrderServiceImplementation implements OrderService{
 
 
 
-        return  createdOrder; //SE LO AGREGUE PPARA QUE ME QUITE EL ERROR DE PaymentRespone
-       // nousado res=paymentService.generatePaymentLink(savedOrder); //ORIGINAL
-       // return res;
+        return  createdOrder;
 
     }
 
@@ -144,7 +143,7 @@ public class OrderServiceImplementation implements OrderService{
 
     }
 
-    @Override   //methods no estaba en OrderService
+    @Override
     public Order findOrderById(Long orderId) throws OrderException {
         Optional<Order> order = orderRepository.findById(orderId);
         if(order.isPresent()) return order.get();
@@ -171,13 +170,6 @@ public class OrderServiceImplementation implements OrderService{
 
         return orders;
     }
-//    private List<MenuItem> filterByVegetarian(List<MenuItem> menuItems, boolean isVegetarian) {
-//    return menuItems.stream()
-//            .filter(menuItem -> menuItem.isVegetarian() == isVegetarian)
-//            .collect(Collectors.toList());
-//}
-
-
 
     @Override
     public Order updateOrder(Long orderId, String orderStatus) throws OrderException {
@@ -185,7 +177,7 @@ public class OrderServiceImplementation implements OrderService{
 
         System.out.println("--------- "+orderStatus);
 
-        if(orderStatus.equals("OUT_FOR_DELIVERY") || orderStatus.equals("ENTREGADO")
+        if(orderStatus.equals("EN CAMINO") || orderStatus.equals("ENTREGADO")
                 || orderStatus.equals("COMPLETADO") || orderStatus.equals("PENDIENTE")) {
 
             order.setOrderStatus(orderStatus);
@@ -196,5 +188,16 @@ public class OrderServiceImplementation implements OrderService{
 
 
     }
+
+    @Override
+    public List<Order> getOrdersByRestaurantAndDateRange(Long restaurantId, Date startDate, Date endDate) throws OrderException {
+        List<Order> orders = orderRepository.findOrdersByRestaurantAndDateRange(restaurantId, startDate, endDate);
+        if (orders.isEmpty()) {
+            throw new OrderException("No hay órdenes en este rango de fechas para este restaurante.");
+        }
+        return orders;
+    }
+
+
 
 }

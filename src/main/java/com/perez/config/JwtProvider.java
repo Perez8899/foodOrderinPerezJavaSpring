@@ -44,7 +44,8 @@ public class JwtProvider {
 		
 		return email;
 	}
-	
+
+	//method to represent roles/permissions
 	public String populateAuthorities(Collection<? extends GrantedAuthority> collection) {
 		Set<String> auths=new HashSet<>();
 		

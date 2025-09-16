@@ -44,27 +44,9 @@ public class AuthController {
    private CustomerUserDetailsService customerUserDetailsService;
    @Autowired
    private CartRepository cartRepository;
-  // private PasswordResetTokenService passwordResetTokenService;
 
    private UserService userService;
 
-  /* public AuthController(UserRepository userRepository,
-                         PasswordEncoder passwordEncoder,
-                         JwtProvider jwtProvider,
-                         CustomerUserDetailsService customerUserDetailsService,
-                         CartRepository cartRepository,
-                         PasswordResetTokenService passwordResetTokenService,
-                         UserService userService
-   ) {
-      this.userRepository = userRepository;
-      this.passwordEncoder = passwordEncoder;
-      this.jwtProvider = jwtProvider;
-      this.customerUserDetailsService = customerUserDetailsService;
-      this.cartRepository=cartRepository;
-      this.passwordResetTokenService=passwordResetTokenService;
-      this.userService=userService;
-
-   } */
 
    @PostMapping("/signup")  //REGISTER
    public ResponseEntity<AuthResponse> createUserHandler(@RequestBody User user) throws Exception {
@@ -93,7 +75,6 @@ public class AuthController {
       Cart cart = new Cart();
       cart.setCustomer(savedUser);
       Cart savedCart = cartRepository.save(cart);
-//		savedUser.setCart(savedCart);
 
       List<GrantedAuthority> authorities=new ArrayList<>();
 
@@ -119,8 +100,7 @@ public class AuthController {
       String username = loginRequest.getEmail();
       String password = loginRequest.getPassword();
 
-      System.out.println(username + " ----- " + password);  //esto me muestra la contrasena hay que eliminar muestra datos sencibles
-      //logger.info("Intento de login para usuario: {}", username);
+      //System.out.println(username + " ----- " + password);
 
       try {
          Authentication authentication = authenticate(username, password);
@@ -165,55 +145,6 @@ public class AuthController {
       //if user and password match
       return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
    }
-
-   /*
-   @PostMapping("/reset-password")
-   public ResponseEntity<ApiResponse> resetPassword(
-
-           @RequestBody ResetPasswordRequest req) throws UserException {
-
-      PasswordResetToken resetToken = passwordResetTokenService.findByToken(req.getToken());
-
-      if (resetToken == null ) {
-         throw new UserException("token is required...");
-      }
-      if(resetToken.isExpired()) {
-         passwordResetTokenService.delete(resetToken);
-         throw new UserException("token get expired...");
-
-      }
-
-      // Update user's password
-      User user = resetToken.getUser();
-      userService.updatePassword(user, req.getPassword());
-
-      // Delete the token
-      passwordResetTokenService.delete(resetToken);
-
-      ApiResponse res=new ApiResponse();
-      res.setMessage("Password updated successfully.");
-      res.setStatus(true);
-
-      return ResponseEntity.ok(res);
-   }
-
-   @PostMapping("/reset-password-request")
-   public ResponseEntity<ApiResponse> resetPassword(@RequestParam("email") String email) throws UserException {
-      User user = userService.findUserByEmail(email);
-      System.out.println("ResetPasswordController.resetPassword()");
-
-      if (user == null) {
-         throw new UserException("user not found");
-      }
-
-      userService.sendPasswordResetEmail(user);
-
-      ApiResponse res=new ApiResponse();
-      res.setMessage("Password reset email sent successfully.");
-      res.setStatus(true);
-
-      return ResponseEntity.ok(res);
-   } */
 
 }
 

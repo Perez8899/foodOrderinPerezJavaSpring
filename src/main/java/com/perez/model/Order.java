@@ -27,7 +27,7 @@ public class Order {
     @ManyToOne                     //many orders, a restaurant
     private Restaurant restaurant;
 
-    private Long totalAmount;
+    private double totalAmount; //  Long
 
     private String orderStatus;
 
@@ -48,5 +48,10 @@ public class Order {
 
     private long totalPrice;
 
+
+    private Double subtotal;
+    private Double deliveryFee;
+    private Double platformFee;
+    private Double iva;
 
 }
